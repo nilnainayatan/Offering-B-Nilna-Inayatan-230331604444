@@ -1,0 +1,485 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Energy Battle</title>
+  <style>
+    body {
+      font-family: Arial, 'Times New Roman', Times, serif;
+      margin: 0;
+      padding: 0;
+      min-height: 100vh;
+      /* Tambahkan background gradient animasi */
+      background: linear-gradient(-45deg, #e0f7fa, #b2dfdb, #ffe082, #ff8a65, #81d4fa, #f9f9f9);
+      background-size: 400% 400%;
+      animation: gradientBG 15s ease infinite;
+    }
+    @keyframes gradientBG {
+      0% {background-position: 0% 50%;}
+      50% {background-position: 100% 50%;}
+      100% {background-position: 0% 50%;}
+    }
+    .container {
+      text-align: center;
+      background: rgba(255,255,255,0.95);
+      padding: 40px;
+      border-radius: 16px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+      max-width: 900px;
+      width: 95%;
+      margin: 50px auto;
+      position: relative;
+      z-index: 2;
+    }
+    h1 {
+      font-size: 2.5em;
+      color: #00796b;
+      margin-bottom: 10px;
+      text-shadow: 1px 2px 8px #b2dfdb;
+    }
+    p {
+      font-size: 1.1em;
+      color: #444;
+      margin-bottom: 30px;
+    }
+    .menu {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 20px;
+      margin-bottom: 30px;
+    }
+    .box {
+      padding: 20px;
+      background-color: #e0f2f1;
+      border: 2px solid #00796b;
+      border-radius: 12px;
+      font-weight: bold;
+      font-size: 1.2em;
+      cursor: pointer;
+      transition: background 0.3s, transform 0.2s, box-shadow 0.3s;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+    }
+    .box:hover {
+      background-color: #b2dfdb;
+      transform: translateY(-3px) scale(1.03);
+      box-shadow: 0 8px 24px rgba(0,0,0,0.10);
+    }
+    .materi-area, .rules-area, .game-area, .test-area {
+      margin-top: 40px;
+      display: none;
+      animation: fadeIn 0.5s;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(20px);}
+      to { opacity: 1; transform: none;}
+    }
+    .materi-box, .rules-box, .game-box, .test-box {
+      text-align: left;
+      background-color: #f0f4f8;
+      padding: 20px;
+      border-radius: 12px;
+      border: 1px solid #ccc;
+      margin-bottom: 20px;
+      box-shadow: 0 2px 12px rgba(129,212,250,0.08);
+    }
+    .question {
+      font-size: 1.2em;
+      margin-bottom: 20px;
+      text-align: center;
+    }
+    .choices {
+      text-align: center;
+    }
+    .choices button {
+      display: block;
+      margin: 10px auto;
+      padding: 10px 20px;
+      border: none;
+      border-radius: 8px;
+      background-color: #00796b;
+      color: white;
+      font-size: 1em;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    .choices button:hover {
+      background-color: #004d40;
+    }
+    #feedback {
+      margin-top: 20px;
+      font-weight: bold;
+      text-align: center;
+      min-height: 24px;
+    }
+    /* Thermometer styles */
+    .thermo-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      margin-top: 20px;
+    }
+    .thermometer {
+      margin-top: 20px;
+      height: 180px;
+      width: 40px;
+      border-radius: 20px;
+      border: 2px solid #333;
+      background: linear-gradient(to top, #ff5252 0%, #ffe082 50%, #81d4fa 100%);
+      position: relative;
+      overflow: hidden;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.07);
+    }
+    .level {
+      position: absolute;
+      bottom: 0;
+      width: 100%;
+      border-radius: 0 0 20px 20px;
+      background-color: #ff5252;
+      transition: height 0.5s, background 0.5s;
+    }
+    .thermo-labels {
+      width: 60px;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      position: absolute;
+      left: 50px;
+      top: 0;
+      height: 180px;
+      justify-content: space-between;
+      font-size: 0.9em;
+      color: #555;
+      pointer-events: none;
+    }
+    .thermo-inputs {
+      margin-top: 10px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 10px;
+    }
+    .thermo-inputs input[type="number"] {
+      padding: 10px;
+      width: 180px;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+      font-size: 1em;
+    }
+    .thermo-inputs button {
+      padding: 10px 20px;
+      background-color: #1e88e5;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 1em;
+      transition: background 0.2s;
+    }
+    .thermo-inputs button:hover {
+      background-color: #1565c0;
+    }
+    .result {
+      margin-top: 15px;
+      font-size: 1.1em;
+      font-weight: bold;
+      color: #00796b;
+      min-height: 32px;
+    }
+    /* Tambahkan efek partikel latar belakang */
+    .particles {
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      pointer-events: none;
+      z-index: 0;
+    }
+    @media (max-width: 600px) {
+      .container {
+        padding: 10px;
+      }
+      .menu {
+        grid-template-columns: 1fr;
+      }
+      .thermo-inputs input[type="number"] {
+        width: 100%;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- Partikel latar belakang -->
+  <canvas class="particles" id="particles"></canvas>
+  <div class="container">
+    <h1>Energy Battle</h1>
+    <p>Selamat datang di <strong>Energy Battle</strong>! Pelajari konsep dasar termokimia, termasuk perubahan entalpi, energi ikatan, dan hukum Hess, sambil bermain dan menguji pemahamanmu.</p>
+    <div class="menu">
+      <div class="box" onclick="showMateri()">Materi</div>
+      <div class="box" onclick="showRules()">Rules</div>
+      <div class="box" onclick="showGame()">Game</div>
+      <div class="box" onclick="showTest()">Test</div>
+    </div>
+
+    <!-- Materi -->
+    <div class="materi-area" id="materiArea">
+      <div class="materi-box">
+        <h2>Materi Termokimia Dasar</h2>
+        <p><strong>Entalpi (H):</strong> adalah ukuran energi panas dalam sistem pada tekanan konstan. Perubahan entalpi (&Delta;H) menunjukkan apakah suatu reaksi menyerap atau melepaskan energi.</p>
+        <p><strong>Reaksi Endoterm:</strong> menyerap energi dari lingkungan, sehingga &Delta;H bernilai positif. Contoh: proses fotosintesis.</p>
+        <p><strong>Reaksi Eksoterm:</strong> melepaskan energi ke lingkungan, sehingga &Delta;H bernilai negatif. Contoh: pembakaran bahan bakar.</p>
+        <p><strong>Energi Ikatan:</strong> adalah energi yang diperlukan untuk memutuskan ikatan kimia dalam 1 mol senyawa dalam fase gas.</p>
+        <p><strong>Hukum Hess:</strong> total perubahan entalpi dari suatu reaksi kimia tidak bergantung pada jalur reaksi, tetapi hanya pada keadaan awal dan akhir.</p>
+      </div>
+    </div>
+
+    <!-- Rules -->
+    <div class="rules-area" id="rulesArea">
+      <div class="rules-box">
+        <h2>Aturan Permainan</h2>
+        <ol>
+          <li>Buka dan pelajari materi yang tersedia pada menu <b>Materi</b>.</li>
+          <li>Setelah membaca materi, buka menu <b>Game</b> untuk mendemonstrasikan virtual termometer dalam membantu pemahaman yang mendalam.</li>
+          <li>Pada menu <b>Game</b> Anda dapat mempelajari suhu dalam beberapa satuan.</li>
+          <li>Selanjutnya buka menu <b>Test</b> untuk menguatkan pemahaman.</li>
+        </ol>
+      </div>
+    </div>
+
+    <!-- Game (Thermometer) -->
+    <div class="game-area" id="gameArea">
+      <div class="game-box">
+        <h2>Termometer Interaktif</h2>
+        <div class="thermo-inputs">
+          <input type="number" id="celcius" placeholder="Masukkan suhu dalam °C" min="-50" max="100">
+          <button onclick="konversiSuhu()">Konversi</button>
+        </div>
+        <div class="result" id="hasil"></div>
+        <div class="thermo-container" style="position:relative;">
+          <div class="thermometer" id="thermometer">
+            <div class="level" id="level" style="height: 0%;"></div>
+          </div>
+          <div class="thermo-labels" style="position:absolute;top:0;left:60px;height:180px;">
+            <div>100°C</div>
+            <div>50°C</div>
+            <div>0°C</div>
+            <div>-20°C</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Test -->
+    <div class="test-area" id="testArea">
+      <div class="test-box">
+        <h2>Quiz Termokimia</h2>
+        <div class="question" id="question">Soal akan muncul di sini...</div>
+        <div class="choices" id="choices"></div>
+        <div id="feedback"></div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Quiz Data
+    const questions = [
+      {
+        question: "Apa yang dimaksud dengan entalpi (H)?",
+        choices: [
+          "Energi total dari reaktan",
+          "Energi panas yang dilepas atau diserap dalam reaksi",
+          "Jumlah massa zat",
+          "Perubahan suhu campuran"
+        ],
+        correct: 1
+      },
+      {
+        question: "Reaksi endoterm berarti...",
+        choices: [
+          "Melepaskan panas",
+          "Menghasilkan api",
+          "Menyerap panas",
+          "Menghasilkan uap"
+        ],
+        correct: 2
+      },
+      {
+        question: "Ketika es melebur menjadi air, suhu sistem tetap konstan karena energi digunakan untuk...",
+        choices: [
+          "Meningkatkan energi kinetik molekul",
+          "Memutus ikatan hidrogen antar molekul air",
+          "Menurunkan tekanan sistem",
+          "Membentuk gas"
+        ],
+        correct: 1
+      },
+      {
+        question: "Pada reaksi eksoterm, energi panas dilepaskan ke lingkungan, sehingga suhu lingkungan biasanya...",
+        choices: [
+          "Menurun",
+          "Meningkat",
+          "Tetap sama",
+          "Berubah secara acak"
+        ],
+        correct: 1
+      },
+      {
+        question: "Satuan umum dari entalpi adalah...",
+        choices: [ 
+          "kg",
+          "mol",
+          "Joule (J)",
+          "Kelvin (K)"
+        ],
+        correct: 2
+      }
+    ];
+
+    let current = 0;
+
+    function showMateri() {
+      hideAll();
+      document.getElementById("materiArea").style.display = "block";
+    }
+    function showRules() {
+      hideAll();
+      document.getElementById("rulesArea").style.display = "block";
+    }
+    function showGame() {
+      hideAll();
+      document.getElementById("gameArea").style.display = "block";
+    }
+    function showTest() {
+      hideAll();
+      document.getElementById("testArea").style.display = "block";
+      current = 0;
+      showQuestion();
+    }
+    function hideAll() {
+      document.getElementById("materiArea").style.display = "none";
+      document.getElementById("rulesArea").style.display = "none";
+      document.getElementById("gameArea").style.display = "none";
+      document.getElementById("testArea").style.display = "none";
+    }
+
+    // Quiz Logic
+    function showQuestion() {
+      const q = questions[current];
+      document.getElementById("question").innerText = q.question;
+      const choicesDiv = document.getElementById("choices");
+      choicesDiv.innerHTML = "";
+      q.choices.forEach((choice, index) => {
+        const btn = document.createElement("button");
+        btn.innerText = choice;
+        btn.onclick = () => checkAnswer(index);
+        choicesDiv.appendChild(btn);
+      });
+      document.getElementById("feedback").innerText = "";
+    }
+
+    function checkAnswer(selected) {
+      const correct = questions[current].correct;
+      const feedback = document.getElementById("feedback");
+      if (selected === correct) {
+        feedback.innerText = "✅ Benar!";
+      } else {
+        feedback.innerText = "❌ Salah. Coba lagi.";
+        return;
+      }
+      current++;
+      if (current < questions.length) {
+        setTimeout(showQuestion, 1000);
+      } else {
+        setTimeout(() => {
+          document.getElementById("question").innerText = "Quiz selesai! Terima kasih sudah bermain.";
+          document.getElementById("choices").innerHTML = "";
+          document.getElementById("feedback").innerText = "";
+        }, 1200);
+      }
+    }
+
+    // Thermometer Logic
+    function konversiSuhu() {
+      const celcius = parseFloat(document.getElementById("celcius").value);
+      if (isNaN(celcius)) {
+        document.getElementById("hasil").innerHTML = "<span style='color:red'>Masukkan angka suhu yang valid.</span>";
+        document.getElementById("level").style.height = "0%";
+        return;
+      }
+      const fahrenheit = (celcius * 9/5) + 32;
+      const kelvin = celcius + 273.15;
+      document.getElementById("hasil").innerHTML = 
+        `Fahrenheit: ${fahrenheit.toFixed(2)} °F<br>Kelvin: ${kelvin.toFixed(2)} K`;
+
+      // Thermometer scaling: -20°C = 0%, 100°C = 100%
+      let percent = ((celcius + 20) / 120) * 100;
+      percent = Math.max(0, Math.min(percent, 100));
+      const levelDiv = document.getElementById("level");
+      levelDiv.style.height = percent + "%";
+
+      // Color based on temperature
+      if (celcius < 10) {
+        levelDiv.style.background = "linear-gradient(to top, #81d4fa, #b3e5fc)";
+      } else if (celcius < 30) {
+        levelDiv.style.background = "linear-gradient(to top, #ffe082, #fff176)";
+      } else {
+        levelDiv.style.background = "linear-gradient(to top, #ff5252, #ff8a65)";
+      }
+    }
+
+    // Efek partikel latar belakang
+    // Sederhana: bubble warna-warni
+    const canvas = document.getElementById('particles');
+    const ctx = canvas.getContext('2d');
+    let particles = [];
+    function resizeCanvas() {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+    }
+    window.addEventListener('resize', resizeCanvas);
+    resizeCanvas();
+
+    function randomColor() {
+      const colors = ['#81d4fa','#ffe082','#ff8a65','#b2dfdb','#f9f9f9','#00796b'];
+      return colors[Math.floor(Math.random()*colors.length)];
+    }
+    function createParticles() {
+      particles = [];
+      for(let i=0;i<40;i++) {
+        particles.push({
+          x: Math.random()*canvas.width,
+          y: Math.random()*canvas.height,
+          r: 10+Math.random()*18,
+          dx: -0.5+Math.random(),
+          dy: 0.2+Math.random()*0.7,
+          color: randomColor(),
+          alpha: 0.15+Math.random()*0.15
+        });
+      }
+    }
+    function drawParticles() {
+      ctx.clearRect(0,0,canvas.width,canvas.height);
+      for(let p of particles) {
+        ctx.globalAlpha = p.alpha;
+        ctx.beginPath();
+        ctx.arc(p.x,p.y,p.r,0,2*Math.PI);
+        ctx.fillStyle = p.color;
+        ctx.fill();
+        ctx.globalAlpha = 1;
+        p.x += p.dx;
+        p.y += p.dy;
+        if(p.y-p.r>canvas.height) {
+          p.y = -p.r;
+          p.x = Math.random()*canvas.width;
+        }
+        if(p.x-p.r>canvas.width) p.x = -p.r;
+        if(p.x+p.r<0) p.x = canvas.width+p.r;
+      }
+      requestAnimationFrame(drawParticles);
+    }
+    createParticles();
+    drawParticles();
+
+    // Show Materi by default
+    showMateri();
+  </script>
+</body>
+</html>
